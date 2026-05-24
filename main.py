@@ -42,6 +42,7 @@ def show_error(msg):
 
 
 def add_note():
+    global next_id
     print("\n--- Додати нотатку ---")
     title = input("Заголовок: ").strip()
     text = input("Текст: ").strip()
@@ -150,5 +151,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# змі
