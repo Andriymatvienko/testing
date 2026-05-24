@@ -19,6 +19,14 @@ def load_notes():
             next_id = 1
 
 
+def save_notes():
+    try:
+        with open("notes.json", "w", encoding="utf-8") as file:
+            json.dump({"notes": notes, "next_id": next_id}, file, ensure_ascii=False, indent=4)
+    except Exception as e:
+        print(f"\n[СИСТЕМНА ПОМИЛКА]: Не вдалося зберегти дані у файл: {e}")
+
+
 def show_menu():
     print()
     print("=" * 40)
@@ -46,9 +54,14 @@ def add_note():
     print("\n--- Додати нотатку ---")
     title = input("Заголовок: ").strip()
     text = input("Текст: ").strip()
+
     if not title:
         show_error("Заголовок не може бути порожнім!")
         return
+    if not text:
+        show_error("Текст нотатки не може бути порожнім!")
+        return
+
     date_str = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
     note = {
         "id": next_id,
@@ -58,6 +71,8 @@ def add_note():
     }
     notes.append(note)
     next_id += 1
+
+    save_notes()
     show_success(f"Нотатку '{title}' додано успішно!")
 
 
@@ -88,7 +103,21 @@ def view_notes():
     if not notes:
         show_error("Список нотаток порожній.")
         return
-    for n in notes:
+
+    print("Оберіть сортування:")
+    print("  1. За порядком створення (старі -> нові)")
+    print("  2. За алфавітом заголовків (А-Я)")
+    print("  3. Від найновіших до найстаріших")
+    sort_choice = input("Ваш вибір сортування (за замовчуванням - 1): ").strip()
+
+    if sort_choice == "2":
+        display_notes = sorted(notes, key=lambda x: x["title"].lower())
+    elif sort_choice == "3":
+        display_notes = sorted(notes, key=lambda x: x["id"], reverse=True)
+    else:
+        display_notes = notes
+
+    for n in display_notes:
         print(f"\n  ID: {n['id']}  |  {n['title']}  |  {n['date']}")
         print(f"  {n['text']}")
         print("  " + "-" * 36)
@@ -100,20 +129,30 @@ def edit_note():
         show_error("Немає нотаток для редагування.")
         return
     try:
-        nid = int(input("Введіть ID нотатки: "))
+        nid = int(
+            input("Введіть ID нотатки для редагування: "))
     except ValueError:
-        show_error("Невірний ID.")
+        show_error("ID має бути числом!")
         return
+
     for n in notes:
         if n["id"] == nid:
             print(f"Поточний заголовок: {n['title']}")
             new_title = input("Новий заголовок (Enter - залишити): ").strip()
             print(f"Поточний текст: {n['text']}")
             new_text = input("Новий текст (Enter - залишити): ").strip()
+
             if new_title:
                 n["title"] = new_title
             if new_text:
                 n["text"] = new_text
+
+            if not n["title"] or not n["text"]:
+                show_error("Редагування скасовано! Заголовок або текст не можуть стати порожніми.")
+                load_notes()
+                return
+
+            save_notes()
             show_success("Нотатку оновлено!")
             return
     show_error(f"Нотатку з ID {nid} не знайдено.")
@@ -124,10 +163,19 @@ def delete_note():
     if not notes:
         show_error("Немає нотаток для видалення.")
         return
-    nid = input("Введіть ID нотатки для видалення: ").strip()
+
+    nid_input = input("Введіть ID нотатки для видалення: ").strip()
+
+    try:
+        nid = int(nid_input)
+    except ValueError:
+        show_error("ID має бути цілим числом!")
+        return
+
     for i, n in enumerate(notes):
         if n["id"] == nid:
             notes.pop(i)
+            save_notes()
             show_success(f"Нотатку ID {nid} видалено.")
             return
     show_error(f"Нотатку з ID {nid} не знайдено.")
