@@ -66,12 +66,19 @@ def search_notes():
     if not notes:
         show_error("Нотаток немає.")
         return
-    query = input("Введіть пошуковий запит: ").strip()
-    results = [n for n in notes if query in n["title"]]
+    query = input("Введіть пошуковий запит: ").strip().lower()
+
+    if not query:
+        show_error("Пошуковий запит не може бути порожнім!")
+        return
+
+    results = [n for n in notes if query in n["title"].lower() or query in n["text"].lower()]
+
     if results:
         print(f"\nЗнайдено {len(results)} нотатку(ок):")
         for n in results:
             print(f"  [{n['id']}] {n['title']} ({n['date']})")
+            print(f"  Текст: {n['text']}\n  " + "-" * 36)
     else:
         show_error("Нічого не знайдено.")
 
