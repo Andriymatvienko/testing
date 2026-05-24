@@ -19,11 +19,11 @@ def show_menu():
 
 
 def show_success(msg):
-    print(msg)
+    print(f"\n[УСПІХ] {msg}")
 
 
 def show_error(msg):
-    print(msg)
+    print(f"\n[ПОМИЛКА] {msg}")
 
 
 def add_note():
