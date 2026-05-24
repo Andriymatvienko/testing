@@ -1,7 +1,22 @@
 import datetime
+import json
+import os
 
 notes = []
 next_id = 1
+
+
+def load_notes():
+    global notes, next_id
+    if os.path.exists("notes.json"):
+        try:
+            with open("notes.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+                notes = data.get("notes", [])
+                next_id = data.get("next_id", 1)
+        except Exception:
+            notes = []
+            next_id = 1
 
 
 def show_menu():
@@ -111,6 +126,7 @@ def delete_note():
 
 
 def main():
+    load_notes()
     print("Ласкаво просимо до Нотатника!")
     while True:
         show_menu()
@@ -135,4 +151,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-#змі
+# змі
