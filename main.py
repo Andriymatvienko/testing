@@ -5,7 +5,6 @@ next_id = 1
 
 
 def show_menu():
-    print("\nВаш вибір: ", end="")
     print()
     print("=" * 40)
     print("        НОТАТНИК - ГОЛОВНЕ МЕНЮ")
